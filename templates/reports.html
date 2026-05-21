@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-3">
+    <div>
+        <h2 class="fw-bold mb-0 text-dark-blue">Attendance Reports</h2>
+        <p class="text-muted mb-0">Overview of student attendance performance</p>
+    </div>
+    <a href="{{ url_for('export_csv') }}" class="btn btn-success rounded-pill px-4 shadow-sm btn-hover-effect">
+        <i class="fa-solid fa-file-csv me-2"></i>Export to CSV
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm table-card mb-5">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 custom-table text-nowrap" id="reportsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">USN</th>
+                        <th>Student Name</th>
+                        <th>Department</th>
+                        <th class="text-center">Classes Attended</th>
+                        <th class="text-center">Total Classes</th>
+                        <th class="text-center pe-4">Attendance %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report %}
+                    <tr>
+                        <td class="ps-4 fw-medium"><span class="badge bg-light text-dark border px-2 py-1">{{ row.usn
+                                }}</span></td>
+                        <td class="fw-bold">{{ row.student_name }}</td>
+                        <td class="text-muted">{{ row.department }}</td>
+                        <td class="text-center text-success fw-bold">{{ row.present_days }}</td>
+                        <td class="text-center fw-medium">{{ row.total_days }}</td>
+                        <td class="text-center pe-4">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="progress flex-grow-1 me-2" style="height: 8px; max-width: 100px;">
+                                    {% set progress_color = 'success' if row.percentage >= 75 else ('warning' if
+                                    row.percentage >= 60 else 'danger') %}
+                                    <div class="progress-bar bg-{{ progress_color }}" role="progressbar"
+                                        style="width: {{ row.percentage }}%" aria-valuenow="{{ row.percentage }}"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <span class="badge bg-{{ progress_color }} text-white rounded-pill px-2"
+                                    style="min-width: 55px;">{{ row.percentage }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fa-solid fa-clipboard-list fs-1 mb-3 opacity-50"></i>
+                                <h5>No data available</h5>
+                                <p>Mark attendance to generate reports.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

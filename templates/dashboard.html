@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <h2 class="fw-bold mb-0 text-dark-blue">Dashboard Overview</h2>
+    <span class="text-muted"><i class="fa-regular fa-calendar me-2"></i>{{ today }}</span>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm h-100 card-hover-effect bg-primary-gradient">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between text-white">
+                <div>
+                    <h6 class="text-uppercase fw-semibold mb-2 opacity-75">Total Students</h6>
+                    <h2 class="fw-bold mb-0 counter" data-target="{{ students_count }}">{{ students_count }}</h2>
+                </div>
+                <div
+                    class="stat-icon bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-users fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm h-100 card-hover-effect bg-success-gradient">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between text-white">
+                <div>
+                    <h6 class="text-uppercase fw-semibold mb-2 opacity-75">Present Today</h6>
+                    <h2 class="fw-bold mb-0 counter" data-target="{{ present_count }}">{{ present_count }}</h2>
+                </div>
+                <div
+                    class="stat-icon bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-user-check fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm h-100 card-hover-effect bg-danger-gradient">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between text-white">
+                <div>
+                    <h6 class="text-uppercase fw-semibold mb-2 opacity-75">Absent Today</h6>
+                    <h2 class="fw-bold mb-0 counter" data-target="{{ absent_count }}">{{ absent_count }}</h2>
+                </div>
+                <div
+                    class="stat-icon bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-user-xmark fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm chart-card">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold text-dark-blue mb-0">Attendance Trend (Last 7 Days)</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="chart-container" style="position: relative; height:350px; width:100%">
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Fetch chart data
+        fetch('/api/chart-data')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+                // If there's no data, add a placeholder
+                if (data.labels.length === 0) {
+                    data.labels = ['No Data Yet'];
+                    data.present = [0];
+                    data.absent = [0];
+                }
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'Present',
+                                data: data.present,
+                                backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                                borderColor: 'rgba(40, 167, 69, 1)',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                            },
+                            {
+                                label: 'Absent',
+                                data: data.absent,
+                                backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                                borderColor: 'rgba(220, 53, 69, 1)',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                },
+                                grid: {
+                                    borderDash: [2, 4],
+                                    color: "rgba(0,0,0,0.05)"
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            });
+
+        // Counter animation
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200; // The lower the slower
+
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+
+                // Lower inc to slow and higher to fast
+                const inc = target / speed;
+
+                // Check if target is reached
+                if (count < target) {
+                    // Add inc to count and output in counter
+                    counter.innerText = Math.ceil(count + inc);
+                    // Call function every ms
+                    setTimeout(updateCount, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+
+            updateCount();
+        });
+    });
+</script>
+{% endblock %}

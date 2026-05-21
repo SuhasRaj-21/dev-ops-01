@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Attendance System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="login-body">
+    <div class="container">
+        <div class="row min-vh-100 justify-content-center align-items-center">
+            <div class="col-md-6 col-lg-4">
+
+                <div class="card glass-card p-4 shadow-lg border-0 login-card">
+                    <div class="text-center mb-4">
+                        <div class="login-icon-bg mb-3 mx-auto">
+                            <i class="fa-solid fa-graduation-cap fs-1 text-primary"></i>
+                        </div>
+                        <h3 class="fw-bold text-gradient">EduTrack</h3>
+                        <p class="text-muted">Admin Portal Login</p>
+                    </div>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show p-2" role="alert">
+                        <small>{{ message }}</small>
+                        <button type="button" class="btn-close py-2" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('login') }}" class="login-form">
+                        <div class="mb-4 input-group-custom">
+                            <label for="username" class="form-label ms-1 text-muted small fw-bold">USERNAME</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0 text-muted"><i
+                                        class="fa-solid fa-user"></i></span>
+                                <input type="text" class="form-control border-start-0 ps-0" id="username"
+                                    name="username" placeholder="Enter 'admin'" required>
+                            </div>
+                        </div>
+                        <div class="mb-5 input-group-custom">
+                            <label for="password" class="form-label ms-1 text-muted small fw-bold">PASSWORD</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0 text-muted"><i
+                                        class="fa-solid fa-lock"></i></span>
+                                <input type="password" class="form-control border-start-0 ps-0" id="password"
+                                    name="password" placeholder="Enter 'admin123'" required>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit"
+                                class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm btn-hover-effect">
+                                LOGIN <i class="fa-solid fa-arrow-right ms-2 align-middle"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4 text-muted small">
+                        <p class="mb-0">Demo Credentials:</p>
+                        <p class="mb-0 fw-bold">Username: admin | Password: admin123</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
