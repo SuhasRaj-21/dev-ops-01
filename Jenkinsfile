@@ -1,7 +1,6 @@
 pipeline {
 agent any
 
-```
 environment {
     IMAGE_NAME = "devops-project"
     CONTAINER_NAME = "devops-container"
